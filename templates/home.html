@@ -303,6 +303,14 @@
             background-color: var(--starter-color);
         }
         
+        .no-starter-note {
+            font-size: 0.7rem;
+            font-weight: normal;
+            opacity: 0.7;
+            display: inline-block;
+            margin-left: 6px;
+        }
+        
         /* Responsive layouts */
         @media (min-width: 768px) {
             body {
@@ -370,7 +378,7 @@
         <div class="instructions">
             <ul>
                 <li>Click on cards to add/remove from your hand</li>
-                <li>Double-click on a card to set it as the starter card</li>
+                <li>Double-click on a card to set it as the starter card (optional)</li>
             </ul>
         </div>
 
@@ -392,7 +400,7 @@
         {% endif %}
         
         <div class="deck-container">
-            <form method="POST" action="{{ url_for('cribbage') }}" id="cribbage-form">
+            <form method="POST" action="/" id="cribbage-form">
                 <div class="suits-container">
                     {% set suits = [('♠', 'S', 'black'), ('♥', 'H', 'red'), ('♦', 'D', 'red'), ('♣', 'C', 'black')] %}
                     {% set ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] %}
@@ -425,7 +433,10 @@
         <div class="score-container">
             <div class="score-label">Score</div>
             {% if hand_score is not none %}
-                <div class="score-display">{{ hand_score }} points</div>
+                <div class="score-display">
+                    {{ hand_score }} points
+                    {% if not starterCardId %}<span class="no-starter-note">(no starter)</span>{% endif %}
+                </div>
             {% else %}
                 <div class="no-score">Calculate your score</div>
             {% endif %}

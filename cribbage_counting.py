@@ -1,6 +1,9 @@
-def compute_cribbage_score(hand, starter_card):
+def compute_cribbage_score(hand, starter_card=None):
     # Combine hand and starter card
-    total_hand = hand + [starter_card]
+    if starter_card is not None:
+        total_hand = hand + [starter_card]
+    else:
+        total_hand = hand
     score = 0
 
     # Map card ranks to their values
