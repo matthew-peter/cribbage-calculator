@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cribbage Hand Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-light: #e8f0fe;
+            --dark-text: #202124;
+            --medium-text: #5f6368;
+            --light-text: #80868b;
+            --bg-color: #f8f9fa;
+            --card-color: #ffffff;
+            --selected-color: #1a73e8; /* Stronger blue for selected */
+            --starter-color: #ea4335; /* Bright red for starter */
+            --border-color: #dadce0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark-text);
+            line-height: 1.4;
+            padding: 12px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 4px;
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 600px; /* Even narrower container */
+            margin: 0 auto;
+        }
+        
+        .subtitle {
+            color: var(--medium-text);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .instructions {
+            background: var(--card-color);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .instructions h3 {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 2px;
+        }
+        
+        .deck-container {
+            background: var(--card-color);
+            padding: 8px 6px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+        
+        .suits-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            column-gap: 3px;
+        }
+        
+        .suit-column {
+            display: grid;
+            grid-template-rows: auto repeat(13, 1fr);
+            gap: 3px;
+        }
+        
+        .suit-header {
+            color: var(--medium-text);
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+            text-align: center;
+            font-weight: 500;
+            height: 15px;
+        }
+        
+        .card {
+            width: 100%;
+            height: 30px;
+            max-width: 40px;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f3f4;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            margin: 0 auto;
+            border: 1.5px solid transparent;
+        }
+        
+        .card:hover {
+            background-color: #e8eaed;
+        }
+        
+        .card.selected {
+            border: 1.5px solid var(--selected-color);
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        
+        .card.selected::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--selected-color);
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        
+        .card.starter {
+            border: 1.5px solid var(--starter-color);
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        
+        .card.starter::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--starter-color);
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        
+        .card-rank {
+            font-size: 0.7rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+        
+        .card-suit {
+            font-size: 0.8rem;
+            line-height: 1;
+            margin-top: 1px;
+        }
+        
+        .red {
+            color: #ea4335;
+        }
+        
+        .black {
+            color: #202124;
+        }
+        
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 8px;
+        }
+        
+        .score-container {
+            background: var(--card-color);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+        
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--medium-text);
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+        
+        .score-display {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            line-height: 1;
+        }
+        
+        .no-score {
+            color: var(--medium-text);
+            font-size: 0.9rem;
+            padding: 6px;
+        }
+        
+        .btn {
+            font-family: 'Inter', sans-serif;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1765d3;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f3f4;
+            color: var(--dark-text);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e8eaed;
+        }
+        
+        .error-message {
+            background-color: #fce8e6;
+            color: #d93025;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            border: 1px solid #f5c2bf;
+        }
+        
+        .selection-summary {
+            font-size: 0.85rem;
+            color: var(--medium-text);
+            text-align: center;
+            margin-top: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .card-count {
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            color: var(--medium-text);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .legend-hand {
+            background-color: var(--selected-color);
+        }
+        
+        .legend-starter {
+            background-color: var(--starter-color);
+        }
+        
+        /* Responsive layouts */
+        @media (min-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .card-grid {
+                column-gap: 4px;
+                row-gap: 4px;
+            }
+            
+            .card {
+                height: 34px;
+            }
+            
+            .card-rank {
+                font-size: 0.8rem;
+            }
+            
+            .card-suit {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            body {
+                padding: 8px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 2px;
+            }
+            
+            .subtitle {
+                margin-bottom: 8px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .card {
+                height: 24px;
+                max-width: 30px;
+            }
+            
+            .card-rank {
+                font-size: 0.6rem;
+            }
+            
+            .card-suit {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cribbage Hand Calculator</h1>
+        
+        <div class="instructions">
+            <ul>
+                <li>Click on cards to add/remove from your hand</li>
+                <li>Double-click on a card to set it as the starter card</li>
+            </ul>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color legend-hand"></div>
+                <span>Hand</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-starter"></div>
+                <span>Starter</span>
+            </div>
+        </div>
+
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+        
+        <div class="deck-container">
+            <form method="POST" action="{{ url_for('cribbage') }}" id="cribbage-form">
+                <div class="suits-container">
+                    {% set suits = [('♠', 'S', 'black'), ('♥', 'H', 'red'), ('♦', 'D', 'red'), ('♣', 'C', 'black')] %}
+                    {% set ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] %}
+                    
+                    {% for suit_symbol, suit_name, suit_color in suits %}
+                        <div class="suit-column">
+                            <div class="suit-header">{{ suit_name }}</div>
+                            
+                            {% for rank in ranks %}
+                                {% set card_id = rank + '-' + suit_symbol %}
+                                {% set is_selected = card_id in selected_cards %}
+                                {% set is_starter = card_id == starterCardId %}
+                                {% set card_class = 'selected' if is_selected and not is_starter else 'starter' if is_starter else '' %}
+                                
+                                <div class="card {{ card_class }}" 
+                                     onclick="toggleCard('{{ card_id }}')" 
+                                     ondblclick="setStarterCard('{{ card_id }}')">
+                                    <div class="card-rank {{ suit_color }}">{{ rank }}</div>
+                                    <div class="card-suit {{ suit_color }}">{{ suit_symbol }}</div>
+                                    <input type="checkbox" name="cards" value="{{ card_id }}" style="display: none;" 
+                                           {% if is_selected %}checked{% endif %} id="cb-{{ card_id }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+        
+        <div class="score-container">
+            <div class="score-label">Score</div>
+            {% if hand_score is not none %}
+                <div class="score-display">{{ hand_score }} points</div>
+            {% else %}
+                <div class="no-score">Calculate your score</div>
+            {% endif %}
+        </div>
+        
+        <div class="control-panel">
+            <button type="button" class="btn btn-secondary" onclick="clearSelections()">Clear</button>
+            <button type="submit" class="btn btn-primary" form="cribbage-form">Calculate</button>
+        </div>
+    </div>
+    
+    <script>
+        // Variable to store which card is the starter
+        let starterCardId = "{{ starterCardId|default('') }}";
+        
+        function toggleCard(cardId) {
+            const checkbox = document.getElementById('cb-' + cardId);
+            
+            if (checkbox.checked) {
+                // If this is the starter card, we need to handle specially
+                if (cardId === starterCardId) {
+                    starterCardId = null;
+                }
+                checkbox.checked = false;
+            } else {
+                checkbox.checked = true;
+            }
+            
+            // Update the card display
+            updateCardDisplay();
+        }
+        
+        function setStarterCard(cardId) {
+            const checkbox = document.getElementById('cb-' + cardId);
+            
+            // If card not already selected, select it
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+            }
+            
+            // Set as starter card
+            starterCardId = cardId;
+            
+            // Update display
+            updateCardDisplay();
+        }
+        
+        function clearSelections() {
+            // Uncheck all checkboxes
+            const checkboxes = document.querySelectorAll('input[name="cards"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Reset starter card
+            starterCardId = null;
+            
+            // Clear any displayed score
+            const scoreDisplay = document.querySelector('.score-display');
+            if (scoreDisplay) {
+                const scoreContainer = document.querySelector('.score-container');
+                scoreContainer.innerHTML = '<div class="no-score">Calculate your score</div>';
+            }
+            
+            // Update display
+            updateCardDisplay();
+        }
+        
+        function updateCardDisplay() {
+            // Get all selected cards
+            const selectedCheckboxes = document.querySelectorAll('input[name="cards"]:checked');
+            const allCards = document.querySelectorAll('.card');
+            
+            // Reset all card classes
+            allCards.forEach(card => {
+                card.classList.remove('selected');
+                card.classList.remove('starter');
+            });
+            
+            // Apply selected class to selected cards and identify starter
+            selectedCheckboxes.forEach((checkbox) => {
+                const card = checkbox.parentElement;
+                const cardId = checkbox.value;
+                
+                if (cardId === starterCardId) {
+                    card.classList.add('starter');
+                } else {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Prepare the form submission order - starter card should be last
+            reorderFormInputs();
+            
+            // Update the selection count summary
+            updateSelectionSummary();
+        }
+        
+        function reorderFormInputs() {
+            // Get all checked checkboxes
+            const selectedCheckboxes = document.querySelectorAll('input[name="cards"]:checked');
+            const form = document.getElementById('cribbage-form');
+            
+            // Create a hidden input to store the starter card ID
+            let starterInput = document.getElementById('starter-card-input');
+            if (!starterInput) {
+                starterInput = document.createElement('input');
+                starterInput.type = 'hidden';
+                starterInput.name = 'starter_card';
+                starterInput.id = 'starter-card-input';
+                form.appendChild(starterInput);
+            }
+            starterInput.value = starterCardId || '';
+        }
+        
+        function updateSelectionSummary() {
+            const selectedCheckboxes = document.querySelectorAll('input[name="cards"]:checked');
+            let handCount = 0;
+            
+            // Count hand cards (excluding starter)
+            selectedCheckboxes.forEach(checkbox => {
+                if (checkbox.value !== starterCardId) {
+                    handCount++;
+                }
+            });
+            
+            // Update the count display
+            document.getElementById('selection-count').textContent = handCount;
+            
+            // Update starter status
+            if (starterCardId) {
+                const [rank, suit] = starterCardId.split('-');
+                const color = (suit === '♥' || suit === '♦') ? 'color: #ea4335;' : '';
+                document.getElementById('starter-status').innerHTML = 
+                    `starter: <span style="${color}">${rank}${suit}</span>`;
+            } else {
+                document.getElementById('starter-status').textContent = 'no starter card';
+            }
+        }
+        
+        // Initial call to set the display
+        updateCardDisplay();
+    </script>
+</body>
+</html>
