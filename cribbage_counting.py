@@ -58,10 +58,11 @@ def compute_cribbage_score(hand, starter_card=None):
             break  # Only count runs of the longest length
 
     # Calculate knobs
-    for card in hand:
-        if card[0].upper() == 'J' and card[1] == starter_card[1]:
-            score += 1
-            break
+    if starter_card is not None:
+        for card in hand:
+            if card[0].upper() == 'J' and card[1] == starter_card[1]:
+                score += 1
+                break
 
     return score
 
