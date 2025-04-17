@@ -38,7 +38,7 @@ def home():
             
             # Format the starter card if it exists
             starter = None
-            if starter_card_id:
+            if starter_card_id != 'None':
                 rank, suit = starter_card_id.split('-')
                 suit_letter = {'♠': 'S', '♥': 'H', '♦': 'D', '♣': 'C'}[suit]
                 starter = f"{rank}{suit_letter}"
