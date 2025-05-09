@@ -78,7 +78,7 @@
         
         .deck-container {
             background: var(--card-color);
-            padding: 8px 6px;
+            padding: 8px 6px 8px 6px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             margin-bottom: 8px;
@@ -92,7 +92,7 @@
         
         .suit-column {
             display: grid;
-            grid-template-rows: auto repeat(13, 1fr);
+            grid-template-rows: auto repeat(12, 1fr);
             gap: 3px;
         }
         
@@ -311,6 +311,26 @@
             margin-left: 6px;
         }
         
+        .control-legend-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: nowrap;
+        }
+        
+        .control-legend-container .btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .legend {
+            margin-bottom: 0;
+            display: flex;
+            gap: 10px;
+        }
+        
         /* Responsive layouts */
         @media (min-width: 768px) {
             body {
@@ -369,6 +389,28 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* Update existing media query for better responsive design */
+        @media (max-width: 450px) {
+            .control-legend-container {
+                gap: 4px;
+            }
+            
+            .control-legend-container .btn {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .legend {
+                gap: 6px;
+                font-size: 0.7rem;
+            }
+            
+            .legend-color {
+                width: 8px;
+                height: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -378,19 +420,23 @@
         <div class="instructions">
             <ul>
                 <li>Click on cards to add/remove from your hand</li>
-                <li>Double-click on a card to set it as the starter card (optional)</li>
+                <li>Double-click set a card as the starter card (optional)</li>
             </ul>
         </div>
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color legend-hand"></div>
-                <span>Hand</span>
+        <div class="control-legend-container">
+            <button type="submit" class="btn btn-primary" form="cribbage-form">Calculate</button>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-hand"></div>
+                    <span>Hand</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-starter"></div>
+                    <span>Starter</span>
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color legend-starter"></div>
-                <span>Starter</span>
-            </div>
+            <button type="button" class="btn btn-secondary" onclick="clearSelections()">Clear</button>
         </div>
 
         {% if error_message %}
@@ -407,7 +453,6 @@
                     
                     {% for suit_symbol, suit_name, suit_color in suits %}
                         <div class="suit-column">
-                            <div class="suit-header">{{ suit_name }}</div>
                             
                             {% for rank in ranks %}
                                 {% set card_id = rank + '-' + suit_symbol %}
@@ -431,7 +476,6 @@
         </div>
         
         <div class="score-container">
-            <div class="score-label">Score</div>
             {% if hand_score is not none %}
                 <div class="score-display">
                     {{ hand_score }} points
@@ -439,11 +483,6 @@
             {% else %}
                 <div class="no-score">Calculate your score</div>
             {% endif %}
-        </div>
-        
-        <div class="control-panel">
-            <button type="button" class="btn btn-secondary" onclick="clearSelections()">Clear</button>
-            <button type="submit" class="btn btn-primary" form="cribbage-form">Calculate</button>
         </div>
     </div>
     
