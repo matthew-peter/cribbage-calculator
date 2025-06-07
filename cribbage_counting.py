@@ -39,23 +39,24 @@ def compute_cribbage_score(hand, starter_card=None):
 
     # Calculate runs
     counts = Counter(faces)
-    max_run_length = 0
-    total_run_score = 0
-    unique_faces = set(faces)
-    for run_length in range(9, 2, -1):  # Check for runs from length 5 down to 3
+    scored_cards = set()  # Track which cards have been used in runs
+    unique_faces = set(faces)    
+    for run_length in range(min(13, len(faces)), 2, -1):  # Check for runs from length 13 (or the number of cards) down to 3
         runs = []
         for combo in combinations(unique_faces, run_length):
             if max(combo) - min(combo) == run_length - 1:
-                # Calculate multiplicity due to duplicate cards
-                multiplicity = 1
-                for face in combo:
-                    multiplicity *= counts[face]
-                runs.append((run_length, multiplicity))
-        if runs:
-            for run_length, multiplicity in runs:
-                total_run_score += run_length * multiplicity
-            score += total_run_score
-            break  # Only count runs of the longest length
+                # Check if this run overlaps with any already scored runs
+                if not any(card in scored_cards for card in combo):
+                    # Calculate multiplicity due to duplicate cards
+                    multiplicity = 1
+                    for face in combo:
+                        multiplicity *= counts[face]
+                    runs.append((combo, run_length, multiplicity))
+        
+        # Score all non-overlapping runs of this length
+        for combo, run_length, multiplicity in runs:
+            score += run_length * multiplicity
+            scored_cards.update(combo)  # Mark these cards as used
 
     # Calculate knobs
     if starter_card is not None:
