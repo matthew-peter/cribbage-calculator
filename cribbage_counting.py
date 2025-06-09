@@ -70,6 +70,3 @@ def compute_cribbage_score(hand, starter_card=None):
                 break
 
     return score
-
-
-# print(compute_cribbage_score(['2H', '3H', '4H', '5H'], '6H')) # 29
