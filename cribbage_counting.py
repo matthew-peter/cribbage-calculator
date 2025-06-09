@@ -58,6 +58,10 @@ def compute_cribbage_score(hand, starter_card=None):
             score += run_length * multiplicity
             scored_cards.update(combo)  # Mark these cards as used
 
+    # Calculate flush
+    if len(set(suits)) == 1:
+        score += len(total_hand)
+        
     # Calculate knobs
     if starter_card is not None:
         for card in hand:
