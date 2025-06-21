@@ -1,3 +1,6 @@
+from sqlalchemy import values
+
+
 def compute_cribbage_score(hand, starter_card=None):
     # Combine hand and starter card
     if starter_card is not None:
@@ -21,7 +24,7 @@ def compute_cribbage_score(hand, starter_card=None):
 
     # Calculate fifteens
     from itertools import combinations
-    for i in range(2,10):
+    for i in range(2, min(10, len(values))):
         for combo in combinations(values, i):
             if sum(combo) == 15:
                 score += 2
