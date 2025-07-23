@@ -1,6 +1,3 @@
-from sqlalchemy import values
-
-
 def compute_cribbage_score(hand, starter_card=None):
     # Combine hand and starter card
     if starter_card is not None:
